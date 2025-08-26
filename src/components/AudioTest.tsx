@@ -3,8 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { Textarea } from './ui/textarea';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Volume2, VolumeX, Mic, MicOff, CheckCircle, XCircle, ArrowRight, Play, Pause, Keyboard } from 'lucide-react';
 import { toast } from 'sonner';
@@ -297,33 +295,16 @@ export const AudioTest = ({ onNext }: AudioTestProps) => {
                 {sampleTexts[selectedLanguage as keyof typeof sampleTexts]}
               </div>
               
-              <div className="border rounded-lg overflow-hidden bg-background">
-                <ReactQuill
-                  value={typedText}
-                  onChange={handleTextChange}
-                  placeholder="येथे टाइप करा / Type here..."
-                  theme="snow"
-                  style={{
-                    fontSize: '16px',
-                    lineHeight: '1.6',
-                    fontFamily: selectedLanguage === 'mr' || selectedLanguage === 'hi' ? 
-                      '"Noto Sans Devanagari", "Arial Unicode MS", Arial, sans-serif' : 
-                      selectedLanguage === 'ta' ? '"Noto Sans Tamil", "Arial Unicode MS", Arial, sans-serif' :
-                      selectedLanguage === 'te' ? '"Noto Sans Telugu", "Arial Unicode MS", Arial, sans-serif' :
-                      selectedLanguage === 'kn' ? '"Noto Sans Kannada", "Arial Unicode MS", Arial, sans-serif' :
-                      'inherit'
-                  }}
-                  modules={{
-                    toolbar: [
-                      [{ 'header': [1, 2, 3, false] }],
-                      ['bold', 'italic', 'underline'],
-                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                      [{ 'align': [] }],
-                      ['clean']
-                    ]
-                  }}
-                />
-              </div>
+              <Textarea
+                value={typedText}
+                onChange={(e) => handleTextChange(e.target.value)}
+                placeholder="येथे टाइप करा / Type here..."
+                className="min-h-24"
+                style={{
+                  fontSize: '16px',
+                  lineHeight: '1.5'
+                }}
+              />
               
               <div className="text-xs text-muted-foreground">
                 Progress: {typedText.length >= 10 ? '✓ Complete' : `${typedText.length}/10 characters minimum`}
