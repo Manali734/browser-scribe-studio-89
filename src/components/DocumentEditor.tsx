@@ -8,7 +8,7 @@ import { AudioPlayer } from './AudioPlayer';
 import { saveAs } from 'file-saver';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { toast } from 'sonner';
-import { ArrowLeft, Clock, Play, Pause } from 'lucide-react';
+import { ArrowLeft, Clock, Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 interface DocumentEditorProps {
   onBack?: () => void;
@@ -21,6 +21,7 @@ export const DocumentEditor = ({ onBack }: DocumentEditorProps) => {
   const [isListeningPeriod, setIsListeningPeriod] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('mr');
+  const [audioPlaybackRate, setAudioPlaybackRate] = useState(1.0);
   
   const quillRef = useRef<ReactQuill>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -90,6 +91,19 @@ export const DocumentEditor = ({ onBack }: DocumentEditorProps) => {
         audioRef.current.play();
         setIsAudioPlaying(true);
       }
+    }
+  };
+
+  const changePlaybackSpeed = (speed: number) => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+      setAudioPlaybackRate(speed);
+    }
+  };
+
+  const skipAudio = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime + seconds);
     }
   };
 
@@ -249,32 +263,89 @@ export const DocumentEditor = ({ onBack }: DocumentEditorProps) => {
               </div>
             </div>
             
-            <div className="mt-6 flex items-center gap-4">
+            <div className="mt-6 space-y-4">
               <audio ref={audioRef} className="hidden" />
-              <Button
-                onClick={toggleAudio}
-                variant={isAudioPlaying ? "secondary" : "default"}
-                size="lg"
-                className="flex items-center gap-2"
-              >
-                {isAudioPlaying ? (
-                  <>
-                    <Pause className="h-5 w-5" />
-                    ऑडिओ थांबवा / Pause Audio
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-5 w-5" />
-                    ऑडिओ चालू करा / Play Audio
-                  </>
-                )}
-              </Button>
               
-              <div className="flex-1 bg-white rounded-lg p-4 border">
-                <p className="text-sm text-muted-foreground mb-2">ऑडिओ स्थिती / Audio Status:</p>
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${isAudioPlaying ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
-                  <span className="text-sm">{isAudioPlaying ? 'Playing' : 'Paused'}</span>
+              {/* Main Audio Controls */}
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={toggleAudio}
+                  variant={isAudioPlaying ? "secondary" : "default"}
+                  size="lg"
+                  className="flex items-center gap-2"
+                >
+                  {isAudioPlaying ? (
+                    <>
+                      <Pause className="h-5 w-5" />
+                      ऑडिओ थांबवा / Pause Audio
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-5 w-5" />
+                      ऑडिओ चालू करा / Play Audio
+                    </>
+                  )}
+                </Button>
+                
+                <div className="flex-1 bg-white rounded-lg p-4 border">
+                  <p className="text-sm text-muted-foreground mb-2">ऑडिओ स्थिती / Audio Status:</p>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${isAudioPlaying ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                    <span className="text-sm">{isAudioPlaying ? 'Playing' : 'Paused'}</span>
+                    <span className="text-xs text-muted-foreground ml-2">({audioPlaybackRate}x speed)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advanced Audio Controls */}
+              <div className="bg-white rounded-lg p-4 border">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => skipAudio(-5)}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                    >
+                      <SkipBack className="h-4 w-4" />
+                      -5s
+                    </Button>
+                    
+                    <Button
+                      onClick={() => skipAudio(5)}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                    >
+                      <SkipForward className="h-4 w-4" />
+                      +5s
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">गती / Speed:</span>
+                    <Button
+                      onClick={() => changePlaybackSpeed(1.0)}
+                      variant={audioPlaybackRate === 1.0 ? "default" : "outline"}
+                      size="sm"
+                    >
+                      1x
+                    </Button>
+                    <Button
+                      onClick={() => changePlaybackSpeed(2.0)}
+                      variant={audioPlaybackRate === 2.0 ? "default" : "outline"}
+                      size="sm"
+                    >
+                      2x
+                    </Button>
+                    <Button
+                      onClick={() => changePlaybackSpeed(3.0)}
+                      variant={audioPlaybackRate === 3.0 ? "default" : "outline"}
+                      size="sm"
+                    >
+                      3x
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
